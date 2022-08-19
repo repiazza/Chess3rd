@@ -1,3 +1,4 @@
+
 const PIECE_TYPE_ROOK    = 'R';
 const PIECE_TYPE_KNIGHT  = 'N';
 const PIECE_TYPE_BISHOP  = 'B';
@@ -245,9 +246,7 @@ Game.load = function () {
     ];
 };
 Game.init = function () {
-    // Keyboard.listenForEvents(
-    //     [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
-    // Mouse.listenForEvents();
+    Mouse.listenForEvents();
     this.tileAtlas = Loader.getImage('tiles');
     // this.tileAtlas = Loader.getImage('trtiles');
     // this.tileAtlas = Loader.getImage('pieces');
@@ -314,44 +313,103 @@ function printLayer(layer, mapp){
     }
     console.debug(header + line)
 }
+function printMatrix(mtx){
+    var line = ""
+    var header = ""
+    for (var c = 8; c >= 0; c--) {
+        for (var r = 8; r >= 0; r--) {
+            // if ( c == 8 || r == 0 )
+            //     header +=  " ";
+            // else if ( c != 8)
+            //     header +=  " "+columnArray[c]+Number(r) ;
+                
+            
+            if (mtx[r * map.cols + c] !== undefined && c != 8)
+                line += columnArray[c]+Number(r+1) + " " + mtx[r * map.cols + c] + " " ;
+            
+        }
+        // header += "\n";
+        line += "\n";
+    }
+    console.debug(line)
+}
+
 function validateIsOnRange(row,col){
     var mapoverlap =[];
     var initcol = Game.selected[1];
     var initrow = Game.selected[0];
     var initpos = initrow * map.cols + initcol-1;
-    var rlimit = false
+    // var rlimit = false
     var climit = false
     var dlimit = false
     var limit = false
+        // 4, 1, 9, 9, 9, 9, 9, 9, 7,  
+        // 4, 1, 9, 9, 9, 9, 9, 7, 9,  
+        // 4, 1, 9, 9, 9, 9, 7, 9, 9, 
+        // 4, 1, 9, 9, 9, 7, 9, 9, 9,  
+        // 4, 1, 9, 9, 7, 9, 9, 9, 9,  
+        // 4, 1, 8, 7, 9, 9, 9, 9, 9,  
+        // 4, 1, 7, 8, 9, 9, 9, 9, 9,  
+        // 4, 5, 2, 2, 2, 2, 2, 2, 2,  
+        // 4, 4, 4, 4, 4, 4, 4, 4, 4
+        // var layer3 = map.layers[3].slice()
+        // printMatrix(layer3);
+        // printMatrix(layer4);
+        var matrix = [// 3 movimento
+        [4, 1, 9, 9, 9, 9, 9, 9, 7]  ,
+        [4, 1, 9, 9, 9, 9, 9, 7, 9  ],
+        [4, 1, 9, 9, 9, 9, 7, 9, 9 ],
+        [4, 1, 9, 9, 9, 7, 9, 9, 9 ] ,
+        [4, 1, 9, 9, 7, 9, 9, 9, 9 ], 
+       [ 4, 1, 8, 7, 9, 9, 9, 9, 9 ] ,
+       [ 4, 1, 7, 8, 9, 9, 9, 9, 9]  ,
+        [4, 5, 2, 2, 2, 2, 2, 2, 2  ],
+       [ 4, 4, 4, 4, 4, 4, 4, 4, 4]
+    ]
+        
+    //    var layer4= layer3.reverse()
+       
+    //     // printMatrix(layer4);
+        var layer5= math.transpose(matrix);
+        // var layer6= layer5.reverse()
+        // console.log(layer6)
+        var layer7 = math.transpose(layer5);
+    //    console.log(layer7.flat())
+
+    // //     // layer3 = flipped_Invert_Image(layer4)
+        // printMatrix(layer5);
+
+        map.layers[3] = layer7.flat().slice()
     map.layers[3].forEach(function (key, ndx) {
+        console.log(key + " " + ndx);
         if ( key == 5 ) // initialsq
             mapoverlap[initpos-ndx+1] = 8;
         else {
-            if ( (map.layers[2][initpos-ndx+1] == 4) )
-                limit = true;
+            // if ( (map.layers[2][initpos-ndx+1] == 4) )
+            //     limit = true;
 
             if ( key == 1 && !climit){ // Column
                 if ( limit )
                     climit =true;
                 else
-                    mapoverlap[initpos-ndx+1] = 10;
+                    mapoverlap[Number(initpos)-Number(ndx)+1] = 10;
             }
-            else if ( key == 2 && !rlimit){ // row
-                if ( limit )
-                    rlimit =true;
-                else
-                    mapoverlap[initpos-ndx+1] = 20;
-            }
+            // else if ( key == 2 && !rlimit){ // row
+            //     if ( limit )
+            //         rlimit =true;
+            //     else
+            //         mapoverlap[initpos-ndx+1] = 20;
+            // }
             else if ( key == 7 && !dlimit ){ // oposite diagonal
                 if ( limit )
                     dlimit =true;
                 else
-                    mapoverlap[initpos-ndx+1] = 30;
+                    mapoverlap[(Number(initpos)+Number(ndx))] = 30;
             }
         }
         limit = false;
     });
-
+    // printMatrix(mapoverlap)
 
     var ret = false;
     var ret2 = false;
@@ -360,10 +418,7 @@ function validateIsOnRange(row,col){
     var newarr = map.layers[2].map((e, i) => mapoverlap[i]);
     // printLayer(newarr)
     newarr.map((e, i) => {if ( e !== NaN ) map.layers[2][i] = e});
-    printLayer(0, map)
-    printLayer(1, map)
-    printLayer(2, map)
-    printLayer(3, map)
+    
 
     var tile = map.getTile(2,row,col);
     if ( tile == 10 )
@@ -406,7 +461,7 @@ function captureSquare(row,col){
     return (
               validateIsSelected() 
               && (validateEnemyPieceSquare(row,col)/* || validateEnPassantDestSquare(square)*/)
-            //   && validateIsOnRange(square)
+              && validateIsOnRange(row,col)
             //   && validateIsCaptureSquare(square)
            );
 }
