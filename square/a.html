@@ -1,0 +1,59 @@
+<html>
+ <head>
+   <style>
+    .chartWithOverlay {
+           position: relative;
+           width: 700px;
+    }
+    .overlay {
+           width: 200px;
+           height: 200px;
+           position: absolute;
+           top: 60px;   /* chartArea top  */
+           left: 180px; /* chartArea left */
+    }
+   </style>
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+   <script type="text/javascript">
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = new google.visualization.arrayToDataTable([
+        ['Threat', 'Attacks'],
+        ['Chandrian', 38],
+        ['Ghosts', 12],
+        ['Ghouls', 6],
+        ['UFOs', 44],
+        ['Vampires', 28],
+        ['Zombies', 88]
+      ]);
+
+      var options = {
+        legend: 'none',
+        colors: ['#760946'],
+        vAxis: { gridlines: { count: 4 } }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('line-chart'));
+      chart.draw(data, options);
+    }
+    </script>
+ </head>
+
+ <body>
+  <div class="chartWithOverlay">
+
+   <div id="line-chart" style="width: 700px; height: 500px;"></div>
+
+   <div class="overlay">
+    <div style="font-family:'Arial Black'; font-size: 128px;">88</div>
+    <div style="color: #b44; font-family:'Arial Black'; font-size: 32px; letter-spacing: .21em; margin-top:50px; margin-left:5px;">zombie</div>
+    <div style="color: #444; font-family:'Arial Black'; font-size: 32px; letter-spacing: .15em; margin-top:15px; margin-left:5px;">attacks</div>
+  </div>
+
+ </div>
+
+</body>
+
+</html>
